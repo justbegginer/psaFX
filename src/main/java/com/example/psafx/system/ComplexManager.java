@@ -92,15 +92,15 @@ public class ComplexManager {
             if (deviceManager.isDevicesBusy()) {
                 if (bufferManager.isBuffersBusy()) {
                     if (bufferManager.minTaskByNumber().isEmpty()) {
-                        resultList.add(new Action(Action.Type.TASK_DENY, Action.EntityType.DENY, Optional.empty(), new TimeScale(currentTime), task.getGroup(), task.getNumber(), new TimeScale(currentTime)));
+                        resultList.add(new Action(Action.Type.TASK_DENY, Action.EntityType.DENY, Optional.empty(), new TimeScale(currentTime), task.getGroup(), task.getNumber(), task.getTimeScale()));
                     } else {
                         Buffer buffer = bufferManager.minTaskByNumber().get();
                         if (task.getGroup() < buffer.getNum()) {
-                            resultList.add(new Action(Action.Type.TASK_DENY, Action.EntityType.DENY, Optional.empty(), new TimeScale(currentTime), task.getGroup(), task.getNumber(), new TimeScale(currentTime)));
+                            resultList.add(new Action(Action.Type.TASK_DENY, Action.EntityType.DENY, Optional.empty(), new TimeScale(currentTime), task.getGroup(), task.getNumber(), task.getTimeScale()));
                         } else {
                             // TODO check this part of code may be a lot of problem here
                             Task taskFromBuffer = buffer.popTask(currentTime);// TODO this may ruin the time if this shit gonna delete by garbage collector
-                            resultList.add(new Action(Action.Type.TASK_DENY, Action.EntityType.DEVICE, Optional.of(buffer.getNum()), buffer.getTimeScale(), taskFromBuffer.getGroup(), taskFromBuffer.getNumber(), new TimeScale(currentTime))); // TODO fix end time of timescale
+                            resultList.add(new Action(Action.Type.TASK_DENY, Action.EntityType.DEVICE, Optional.of(buffer.getNum()), buffer.getTimeScale(), taskFromBuffer.getGroup(), taskFromBuffer.getNumber(), taskFromBuffer.getTimeScale())); // TODO fix end time of timescale
                             resultList.add(new Action(Action.Type.BUFFER_ADD, Action.EntityType.BUFFER, Optional.of(buffer.getNum()), buffer.getTimeScale(), task.getGroup(), task.getNumber(), new TimeScale(currentTime))); // TODO fix timeScale
                             bufferManager.addNewTask(task);
                         }

@@ -2,11 +2,13 @@ package com.example.psafx.system;
 
 import com.example.psafx.util.Action;
 import com.example.psafx.util.TimeScale;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Getter
 public class ComplexManager {
     private double currentTime;
 
@@ -16,10 +18,19 @@ public class ComplexManager {
 
     private final DeviceManager deviceManager;
 
-    public ComplexManager(int taskCount, int bufferCount, int deviceCount) {
-        this.taskManager = new TaskManager(taskCount, 0.8);
+    private int taskCount;
+
+    private int bufferCount;
+
+    private int deviceCount;
+
+    public ComplexManager(int taskCount, int bufferCount, int deviceCount, double timeToGenerate, double timeToFinishSeconds) {
+        this.taskManager = new TaskManager(taskCount, timeToGenerate);
         this.bufferManager = new BufferManager(bufferCount);
-        this.deviceManager = new DeviceManager(deviceCount, 1.1);
+        this.deviceManager = new DeviceManager(deviceCount, timeToFinishSeconds);
+        this.taskCount = taskCount;
+        this.bufferCount = bufferCount;
+        this.deviceCount = deviceCount;
         currentTime = 0;
     }
 

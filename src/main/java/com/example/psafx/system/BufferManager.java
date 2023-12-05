@@ -1,10 +1,13 @@
 package com.example.psafx.system;
 
 
+import lombok.Getter;
+
 import java.util.*;
 
 public class BufferManager {
 
+    @Getter
     private Integer lastTaken;
 
     private List<Buffer> bufferList;

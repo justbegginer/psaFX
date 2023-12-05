@@ -13,7 +13,7 @@ public class WriteLogIntoFIle {
         nOperationScript(100);
     }
     public static void beforeDenyScript(){
-        ComplexManager complexManager = new ComplexManager(3, 3, 3);
+        ComplexManager complexManager = new ComplexManager(3, 3, 3, 0.8, 1.1);
         String message = complexManager.iterateString();
 
         try(FileWriter fileWriter = new FileWriter(new File("src/main/resources/log_file.txt"))) {
@@ -29,7 +29,7 @@ public class WriteLogIntoFIle {
     }
 
     public static void nOperationScript(int n){
-        ComplexManager complexManager = new ComplexManager(3, 3, 3);
+        ComplexManager complexManager = new ComplexManager(3, 3, 3, 0.8, 1.1);
         String message = complexManager.iterateString();
 
         try(FileWriter fileWriter = new FileWriter(new File("src/main/resources/log_file.txt"))) {

@@ -14,15 +14,16 @@ public class Device {
 
     private final int number;
 
-    private static final double timeToComplete = 1.1;
+    private final double timeToComplete;
 
     private Task task;
 
     private boolean isBusy;
 
-    public Device(int number) {
+    public Device(int number, double timeToComplete) {
         this.number = number;
         isBusy = false;
+        this.timeToComplete = timeToComplete;
     }
 
 

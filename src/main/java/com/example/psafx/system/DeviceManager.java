@@ -17,7 +17,7 @@ public class DeviceManager {
     public DeviceManager(int deviceCount, double timeToFinishSeconds) {
         deviceList = new ArrayList<>(deviceCount);
         for (int i = 0; i < deviceCount; i++) {
-            deviceList.add(new Device(i + 1));
+            deviceList.add(new Device(i + 1, timeToFinishSeconds));
         }
         this.timeToFinishSeconds = timeToFinishSeconds;
     }

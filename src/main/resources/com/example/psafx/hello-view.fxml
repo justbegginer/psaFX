@@ -9,57 +9,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.shape.Line?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.psafx.views.MainController">
+<?import javafx.scene.Group?>
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.psafx.views.MainController">
     <center>
         <ScrollPane fitToWidth="true" fitToHeight="true">
-            <VBox alignment="CENTER" spacing="20.0">
-
-                <!-- Tasks -->
-                <HBox fx:id="taskContainer1" alignment="CENTER" spacing="10">
-                    <Label text="Task 1" textFill="black" minWidth="50"/>
-                    <Line fx:id="taskLine1" startX="0" endX="100" endY="0.0" stroke="GREEN"/>
-                </HBox>
-                <HBox fx:id="taskContainer2" alignment="CENTER" spacing="10">
-                    <Label text="Task 2" textFill="black" minWidth="50" maxWidth="50"/>
-                    <Line fx:id="taskLine2" startX="0" endX="100" endY="0.0" stroke="GREEN"/>
-                </HBox>
-                <HBox fx:id="taskContainer3" alignment="CENTER" spacing="10">
-                    <Label text="Task 3" textFill="black" minWidth="50" maxWidth="50"/>
-                    <Line fx:id="taskLine3" startX="0" endX="100" endY="0.0" stroke="GREEN"/>
-                </HBox>
-                <!-- Buffers -->
-                <HBox fx:id="bufferContainer1" alignment="CENTER" spacing="10">
-                    <Label text="Buff 1" textFill="black" minWidth="50" maxWidth="50"/>
-                    <Line fx:id="bufferLine1" startX="0" endX="100" endY="0.0" stroke="ORANGE"/>
-                </HBox>
-                <HBox fx:id="bufferContainer2" alignment="CENTER" spacing="10">
-                    <Label text="Buff 2" textFill="black" minWidth="50" maxWidth="50"/>
-                    <Line fx:id="bufferLine2" startX="0" endX="100" endY="0.0" stroke="ORANGE"/>
-                </HBox>
-                <HBox fx:id="bufferContainer3" alignment="CENTER" spacing="10">
-                    <Label text="Buff 3" textFill="black" minWidth="50" maxWidth="50"/>
-                    <Line fx:id="bufferLine3" startX="0" endX="100" endY="0.0" stroke="ORANGE"/>
-                </HBox>
-
-                <!-- Devices -->
-                <HBox fx:id="deviceContainer1" alignment="CENTER" spacing="10">
-                    <Label text="Dev 1" textFill="black" minWidth="50" maxWidth="50"/>
-                    <Line fx:id="deviceLine1" startX="0" endX="100" endY="0.0" stroke="BLUE"/>
-                </HBox>
-                <HBox fx:id="deviceContainer2" alignment="CENTER" spacing="10">
-                    <Label text="Dev 2" textFill="black" minWidth="50" maxWidth="50"/>
-                    <Line fx:id="deviceLine2" startX="0" endX="100" endY="0.0" stroke="BLUE"/>
-                </HBox>
-                <HBox fx:id="deviceContainer3" alignment="CENTER" spacing="10">
-                    <Label text="Dev 3" textFill="black" minWidth="50" maxWidth="50"/>
-                    <Line fx:id="deviceLine3" startX="0" endX="100" endY="0.0" stroke="BLUE"/>
-                </HBox>
-
-                <!-- Deny -->
-                <HBox fx:id="denyContainer" alignment="CENTER" spacing="10">
-                    <Label text="Deny" textFill="black" minWidth="50" maxWidth="50"/>
-                    <Line fx:id="denyLine" startX="0" endX="100" endY="0.0" stroke="RED"/>
-                </HBox>
+            <VBox fx:id="mainContainer" alignment="CENTER" spacing="20.0">
 
             </VBox>
         </ScrollPane>
@@ -69,7 +24,16 @@
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
             </padding>
-            <Button text="Следующий шаг" onAction="#onHelloButtonClick" />
+            <Button text="Следующий шаг" onAction="#onHelloButtonClick"/>
         </HBox>
+
     </bottom>
+    <top>
+        <HBox alignment="TOP_LEFT" spacing="10">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+            </padding>
+            <Label fx:id="logText" text="null" visible="false"/>
+        </HBox>
+    </top>
 </BorderPane>

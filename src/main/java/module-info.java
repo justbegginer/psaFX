@@ -10,4 +10,6 @@ module com.example.psafx {
 
     opens com.example.psafx to javafx.fxml;
     exports com.example.psafx;
+    exports com.example.psafx.views;
+    opens com.example.psafx.views to javafx.fxml;
 }

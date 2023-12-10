@@ -49,6 +49,8 @@ public class BufferManager {
             this.setMinTaskNumber();
         }
         return this.bufferList.stream()
+                .filter(buffer -> buffer != null)
+                .filter(buffer -> buffer.getTask() != null)
                 .filter((buffer -> buffer.getTask().getGroup() == lastTaken))
                 .findFirst().get();
 
@@ -75,6 +77,6 @@ public class BufferManager {
     public Optional<Buffer> minTaskByNumber(){
         return this.bufferList.stream()
                 .filter(buffer -> buffer.getTask() != null)
-                .max(Comparator.comparingInt(buffer -> buffer.getTask().getGroup()));
+                .min(Comparator.comparingInt(buffer -> buffer.getTask().getGroup()));
     }
 }

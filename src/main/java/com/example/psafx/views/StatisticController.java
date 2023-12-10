@@ -3,12 +3,15 @@ package com.example.psafx.views;
 import com.example.psafx.system.ComplexManager;
 import com.example.psafx.util.Action;
 import com.example.psafx.util.TimeScale;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 
 import java.util.*;
 
@@ -40,26 +43,34 @@ public class StatisticController {
 
     private List<Label> bufferLabelsStatistic;
 
+    private TableView<TaskStatistic> taskTable;
+
+    private TableView<DeviceStatistic> deviceTable;
+
     private final ComplexManager complexManager;
 
     public StatisticController() {
-        // testing tasks 3 2 3(Main)
-        // testing devices 3 2 4
-        this.complexManager = new ComplexManager(5, 2, 5, 1, 1.1);
+        // testing tasks 5 2 4(3)
+        // testing devices 5 2 10
+        this.complexManager = new ComplexManager(5, 2, 3, 1, 1.1);
         this.completedTasks = new ArrayList<>(Collections.nCopies(this.complexManager.getTaskCount(), 0));
         this.denyTasks = new ArrayList<>(Collections.nCopies(this.complexManager.getTaskCount(), 0));
     }
 
     @FXML
     public void initialize() {
-        taskBoxes = new ArrayList<>();
-        devicesBoxes = new ArrayList<>();
-        buffersBoxes = new ArrayList<>();
+        this.taskBoxes = new ArrayList<>();
+        this.devicesBoxes = new ArrayList<>();
+        this.buffersBoxes = new ArrayList<>();
+        this.timeInSystem = new ArrayList<>();
+        this.waitTime = new ArrayList<>();
         boxes = new ArrayList<>();
         for (int i = 0; i < complexManager.getTaskCount(); i++) {
             String tempString = "Task " + (i + 1);
             taskBoxes.add(tempString);
             boxes.add(tempString);
+            timeInSystem.add(new ArrayList<>());
+            waitTime.add(new ArrayList<>());
         }
         for (int i = 0; i < complexManager.getBufferCount(); i++) {
             String tempString = "Buffer " + (i + 1);
@@ -79,31 +90,47 @@ public class StatisticController {
                 lineSegmentsMap.get(boxes.get(i)).add(false);
             }
         }
-        taskStatistic = new Label();
-        taskStatistic.setTextFill(Color.RED);
-        mainContainer.getChildren().add(taskStatistic);
-        taskLabelsStatistic = new ArrayList<>();
-        for (int i = 0; i < complexManager.getTaskCount(); i++) {
-            Label tempLabel = new Label();
-            tempLabel.setTextFill(Color.RED);
-            taskLabelsStatistic.add(tempLabel);
-            mainContainer.getChildren().add(tempLabel);
-        }
-        bufferLabelsStatistic = new ArrayList<>();
-        for (int i = 0; i < complexManager.getBufferCount(); i++) {
-            Label tempLabel = new Label();
-            tempLabel.setTextFill(Color.ORANGE);
-            bufferLabelsStatistic.add(tempLabel);
-            mainContainer.getChildren().add(tempLabel);
-        }
-        deviceLabelsStatistic = new ArrayList<>();
-        for (int i = 0; i < complexManager.getDeviceCount(); i++) {
-            Label tempLabel = new Label();
-            tempLabel.setTextFill(Color.BLUE);
-            deviceLabelsStatistic.add(tempLabel);
-            mainContainer.getChildren().add(tempLabel);
-        }
-        // add statistics field
+        this.taskTable = new TableView<TaskStatistic>();
+        TableColumn<TaskStatistic, Number> taskNumber = new TableColumn<>("Task Number");
+        taskNumber.setCellValueFactory(new PropertyValueFactory<>("taskNumber"));
+        TableColumn<TaskStatistic, Number> denyProbability = new TableColumn<>("Deny Probability");
+        denyProbability.setCellValueFactory(new PropertyValueFactory<>("denyProbability"));
+        TableColumn<TaskStatistic, Number> countOfTasks = new TableColumn<>("Count of Tasks");
+        countOfTasks.setCellValueFactory(new PropertyValueFactory<>("completedTaskCount"));
+        TableColumn<TaskStatistic, Number> countOfDeniedTask = new TableColumn<>("Count of Denied");
+        countOfDeniedTask.setCellValueFactory(new PropertyValueFactory<>("deniedTaskCount"));
+        TableColumn<TaskStatistic, Number> averageTimeInSystem = new TableColumn<>("Average Time in System");
+        averageTimeInSystem.setCellValueFactory(new PropertyValueFactory<>("averageTimeInSystem"));
+        TableColumn<TaskStatistic, Number> averageWaitTimeInSystem = new TableColumn<>("Average Wait Time in System");
+        averageWaitTimeInSystem.setCellValueFactory(new PropertyValueFactory<>("averageWaitTimeInSystem"));
+        TableColumn<TaskStatistic, Number> dispersionTimeInSystem = new TableColumn<>("Dispersion Time in System");
+        dispersionTimeInSystem.setCellValueFactory(new PropertyValueFactory<>("dispersionTimeInSystem"));
+        TableColumn<TaskStatistic, Number> dispersionWaitTimeInSystem = new TableColumn<>("Dispersion Wait Time in System");
+        dispersionWaitTimeInSystem.setCellValueFactory(new PropertyValueFactory<>("dispersionWaitTimeInSystem"));
+        taskNumber.setPrefWidth(100);
+        denyProbability.setPrefWidth(150);
+        countOfDeniedTask.setPrefWidth(150);
+        countOfTasks.setPrefWidth(150);
+        averageTimeInSystem.setPrefWidth(200);
+        averageWaitTimeInSystem.setPrefWidth(200);
+        dispersionTimeInSystem.setPrefWidth(200);
+        dispersionWaitTimeInSystem.setPrefWidth(200);
+        this.taskTable.getColumns().addAll(
+                taskNumber, denyProbability,
+                countOfTasks, countOfDeniedTask,
+                averageTimeInSystem, averageWaitTimeInSystem,
+                dispersionTimeInSystem, dispersionWaitTimeInSystem);
+        this.mainContainer.getChildren().add(this.taskTable);
+
+        this.deviceTable = new TableView<DeviceStatistic>();
+        TableColumn<DeviceStatistic, Number> deviceNumber = new TableColumn<>("Device Number");
+        deviceNumber.setCellValueFactory(new PropertyValueFactory<>("deviceNumber"));
+        TableColumn<DeviceStatistic, Number> deviceTableColumn = new TableColumn<>("Busy Ratio");
+        deviceTableColumn.setCellValueFactory(new PropertyValueFactory<>("busyRatio"));
+        deviceTableColumn.setPrefWidth(150);
+        deviceNumber.setPrefWidth(300);
+        this.deviceTable.getColumns().addAll(deviceNumber, deviceTableColumn);
+        this.mainContainer.getChildren().add(this.deviceTable);
     }
 
     @FXML
@@ -129,12 +156,16 @@ public class StatisticController {
                 completedTasks.set(action.getTaskGroup() - 1, completedTasks.get(action.getTaskGroup() - 1) + 1);
                 break;
             case BUFFER_RELEASE:
+                waitTime.get(action.getTaskGroup() - 1)
+                        .add(action.getEntityTimeScale().getEndTime() - action.getEntityTimeScale().getStartTime());
                 createColoredSegmentOnLine(taskBoxes.get(action.getTaskGroup() - 1),
                         action.getTaskTimeScale().getStartTime(), action.getTaskTimeScale().getStartTime());
                 createColoredSegmentOnLine(buffersBoxes.get(action.getEntityNumber().get() - 1),
                         action.getEntityTimeScale().getStartTime(), action.getEntityTimeScale().getEndTime());
                 break;
             case DEVICE_RELEASE:
+                timeInSystem.get(action.getTaskGroup() - 1)
+                        .add(action.getTaskTimeScale().getEndTime() - action.getEntityTimeScale().getStartTime());
                 createColoredSegmentOnLine(taskBoxes.get(action.getTaskGroup() - 1),
                         action.getTaskTimeScale().getStartTime(), action.getTaskTimeScale().getStartTime() + 0.1);
                 completedTasks.set(action.getTaskGroup() - 1, completedTasks.get(action.getTaskGroup() - 1) + 1);
@@ -167,28 +198,33 @@ public class StatisticController {
         }
     }
 
-    List<Integer> completedTasks;
-    List<Integer> denyTasks;
+    private List<Integer> completedTasks;
+    private List<Integer> denyTasks;
+    private List<List<Double>> timeInSystem;
+    private List<List<Double>> waitTime;
+    private List<Double> dispersionTimeInSystem;
+    private List<Double> dispersionWaitTime;
 
     private void getStatistic() {
-        List<Double> deviceBusyRatio = getBusyRatio((int) (complexManager.getCurrentTime() * 10), devicesBoxes);
-        for (int i = 0; i < deviceBusyRatio.size(); i++) {
-            Label tempLabel = deviceLabelsStatistic.get(i);
-            tempLabel.setText("Busy Ratio of Device "+(i+1)+" = " +String.format("%.7f", deviceBusyRatio.get(i)));
-        }
-        List<Double> bufferBusyRatio = getBusyRatio((int) (complexManager.getCurrentTime() * 10), buffersBoxes);
-        for (int i = 0; i < bufferBusyRatio.size(); i++) {
-            Label tempLabel = bufferLabelsStatistic.get(i);
-            tempLabel.setText("Busy Ratio of Buffer "+(i+1)+" = " + String.format("%.7f", bufferBusyRatio.get(i)));
-        }
+        //taskStatistic.setText("Average Deny Probability = " + (double)denyTasks.stream().reduce(Integer::sum).orElse(0) / completedTasks.stream().reduce(Integer::sum).orElse(0));
+        ObservableList<TaskStatistic> taskData = FXCollections.observableArrayList();
         List<Double> taskDenyProbability = getDenyProbability();
-        taskStatistic.setText("Average Deny Probability = " + (double)denyTasks.stream().reduce(Integer::sum).orElse(0) / completedTasks.stream().reduce(Integer::sum).orElse(0));
-
-        for (int i = 0; i < taskLabelsStatistic.size(); i++) {
-            Label tempLabel = taskLabelsStatistic.get(i);
-            tempLabel.setText("Task "+(i+1)+" Deny Probability = " + taskDenyProbability.get(i));
+        List<Double> averageTime = getAverageTime(timeInSystem);
+        List<Double> averageWaitTime = getAverageTime(waitTime);
+        List<Double> dispersionTime = getDispersionTime(timeInSystem, averageTime);
+        List<Double> dispersionWait = getDispersionTime(waitTime, averageWaitTime);
+        for (int i = 0; i < taskDenyProbability.size(); i++) {
+            taskData.add(new TaskStatistic(i + 1, taskDenyProbability.get(i), completedTasks.get(i),
+                    denyTasks.get(i), averageTime.get(i), averageWaitTime.get(i),
+                    dispersionTime.get(i), dispersionWait.get(i)));
         }
-
+        this.taskTable.setItems(taskData);
+        List<Double> deviceBusyRatio = getBusyRatio((int) (complexManager.getCurrentTime() * 10), devicesBoxes);
+        ObservableList<DeviceStatistic> deviceData = FXCollections.observableArrayList();
+        for (int i = 0; i < deviceBusyRatio.size(); i++) {
+            deviceData.add(new DeviceStatistic(i + 1, deviceBusyRatio.get(i)));
+        }
+        this.deviceTable.setItems(deviceData);
     }
 
     private List<Double> getBusyRatio(int time, List<String> boxes) {
@@ -200,13 +236,13 @@ public class StatisticController {
                     sum++;
                 }
             }
-            busyPercents.add(((double)(complexManager.getCurrentTime()*10) - sum) / (complexManager.getCurrentTime()*10));
+            busyPercents.add(((double) (complexManager.getCurrentTime() * 10) - sum) / (complexManager.getCurrentTime() * 10));
         }
         return busyPercents;
     }
 
     private List<Double> getDenyProbability() {
-        List<Double> taskDenyProbabilities = new ArrayList<Double>();
+        List<Double> taskDenyProbabilities = new ArrayList<>();
         for (int i = 0; i < completedTasks.size(); i++) {
             if (completedTasks.get(i) == 0) {
                 taskDenyProbabilities.add(0.);
@@ -216,4 +252,23 @@ public class StatisticController {
         }
         return taskDenyProbabilities;
     }
+
+    private List<Double> getAverageTime(List<List<Double>> all) {
+        List<Double> averageTimeDispersion = new ArrayList<Double>();
+        for (int i = 0; i < completedTasks.size(); i++) {
+            averageTimeDispersion.add(all.get(i).stream().reduce(Double::sum).orElse(0.) / (double) completedTasks.get(i));
+        }
+        return averageTimeDispersion;
+    }
+
+    private List<Double> getDispersionTime(List<List<Double>> all, List<Double> averages){
+        List<Double> average = new ArrayList<Double>();
+        for (int i = 0; i < all.size(); i++) {
+            int finalI = i;
+            average.add(all.get(i).stream().mapToDouble(d -> Math.pow(d-averages.get(finalI), 2)).sum()/completedTasks.get(i));
+        }
+        return average;
+    }
+
+
 }

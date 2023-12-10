@@ -95,7 +95,7 @@ public class ComplexManager {
                         resultList.add(new Action(Action.Type.TASK_DENY, Action.EntityType.DENY, Optional.empty(), new TimeScale(currentTime), task.getGroup(), task.getNumber(), task.getTimeScale()));
                     } else {
                         Buffer buffer = bufferManager.minTaskByNumber().get();
-                        if (task.getGroup() < buffer.getNum()) {
+                        if (task.getGroup() > buffer.getNum()) {
                             resultList.add(new Action(Action.Type.TASK_DENY, Action.EntityType.DENY, Optional.empty(), new TimeScale(currentTime), task.getGroup(), task.getNumber(), task.getTimeScale()));
                         } else {
                             // TODO check this part of code may be a lot of problem here
